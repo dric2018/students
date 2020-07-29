@@ -1,2 +1,4 @@
 # students
-A basic tkinter app for students management
+A basic python tkinter project app for students management.
+
+Just have fun guys !

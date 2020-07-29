@@ -64,7 +64,7 @@ class AppStudent(tk.Tk):
 class PageAccueil(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text = "Page d'accueil", font=LARGE_FONT)
+        label = tk.Label(self, bg="white", text = "Page d'accueil", font=LARGE_FONT)
         label.pack(padx=10, pady=10)
 
 
@@ -74,15 +74,15 @@ class PageAccueil(tk.Frame):
         btn_1.pack( side=tk.BOTTOM)
         btn_2.pack(side=tk.BOTTOM)
 
-        btn_1.place(x=600, y=500)
-        btn_2.place(x=750, y=500)
+        btn_1.place(x=325, y=500)
+        btn_2.place(x=425, y=500)
 
 
 # page Notes
 class PageNotes(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text = "Page Notes", font=LARGE_FONT)
+        label = tk.Label(self, bg="white", text = "Page Notes", font=LARGE_FONT)
         label.pack(padx=10, pady=10)
 
         wrapper1 = LabelFrame(self, text="Tableau des notes")
@@ -100,8 +100,8 @@ class PageNotes(tk.Frame):
         btn_1.pack( side=tk.BOTTOM)
         btn_2.pack(side=tk.BOTTOM)
 
-        btn_1.place(x=550, y=600)
-        btn_2.place(x=700, y=600)
+        btn_1.place(x=325, y=500)
+        btn_2.place(x=425, y=500)
 
 # page Etudiants
 def update(lignes):
@@ -156,7 +156,7 @@ def modifier_etudiant():
 class PageEtudiants(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text = "Page Etudiants", font=LARGE_FONT)
+        label = tk.Label(self, bg="white", text = "Page Etudiants", font=LARGE_FONT)
         label.pack(padx=5, pady=6)
         ################# afficher les etudiants 
 
@@ -275,8 +275,8 @@ class PageEtudiants(tk.Frame):
         btn_1.pack( side=tk.BOTTOM)
         btn_2.pack(side=tk.BOTTOM)
 
-        btn_1.place(x=550, y=600)
-        btn_2.place(x=700, y=600)
+        btn_1.place(x=325, y=650)
+        btn_2.place(x=425, y=650)
 
         # fonctions 
         def get_ligne(event):
