@@ -9,7 +9,7 @@ BD_NAME = "students"
 ma_bd = mc.connect(
     host = "localhost",
     user = "root",
-    passwd ="password",
+    passwd ="",
     database = BD_NAME
 )
 
@@ -155,9 +155,10 @@ def init_projet(etudiants_a_ajouter):
                                     email=email)
                                     
                 # lister les etudiants
-                liste_etudiants = lister_etudiants()
-                for etudiant in liste_etudiants:
-                    print(etudiant)
+                #liste_etudiants = lister_etudiants()
+                #for etudiant in liste_etudiants:
+                    #print(etudiant)
+            print("[INFO] Table Etudiants créée avec succès...")
 
             except Exception as e:
                 print(e)
