@@ -65,7 +65,7 @@ def inserer_etudiant(nom,
     matricule = f"20-EFCPC-{num + 1}"
 
     etudiant = (matricule, 
-                nom, 
+                nom.upper(), 
                 prenoms.lower(), 
                 sexe, 
                 date_naissance, 
