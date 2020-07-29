@@ -82,7 +82,7 @@ def inserer_etudiant(nom,
 
 
 def lister_etudiants():
-    req_lister_etudiants = "SELECT * FROM Etudiants ORDER BY Nom DESC"
+    req_lister_etudiants = "SELECT * FROM Etudiants ORDER BY Nom ASC"
 
     mon_curseur.execute(req_lister_etudiants)
     result = mon_curseur.fetchall()
