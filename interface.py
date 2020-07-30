@@ -121,12 +121,12 @@ class PageNotes(tk.Frame):
 
 
         def RecherNote():
-            req = f"SELECT Note_id, Matricule_Etud, etudiants.Nom, etudiants.Prenoms, etudiants.Sexe,etudiants.Date_naissance, \
-            etudiants.Lieu_naissance, Note_1, Note_2, Note_3, Note_4, Note_5 \
-            FROM notes\
-            INNER JOIN `etudiants` ON notes.Matricule_Etud = etudiants.Matricule\
-            WHERE etudiants.Prenoms LIKE '%{self.q.get().lower()}%' OR etudiants.Nom LIKE '%{self.q.get().lower()}%' ORDER BY Matricule_Etud ASC"
-
+            req = f"SELECT Note_id, Matricule_Etud, etudiants.Nom, etudiants.Prenoms, \
+            etudiants.Sexe, etudiants.Date_naissance, etudiants.Lieu_naissance, Note_1, Note_2, Note_3, Note_4, Note_5 \
+            FROM Notes \
+            INNER JOIN `etudiants` ON notes.Matricule_Etud = etudiants.Matricule \
+            WHERE etudiants.Prenoms LIKE '%{self.q.get().lower()}%' OR etudiants.Nom LIKE '%{self.q.get().upper()}%' ORDER BY Matricule_Etud ASC"            
+            
             mon_curseur.execute(req)
             result = mon_curseur.fetchall()
             update(result)
@@ -160,14 +160,14 @@ class PageNotes(tk.Frame):
 
         def tous_les_champs_ok():
 
-            note1 = self.c7.get()
-            note_2 = self.c8.get()
-            note_3 = self.c9.get()
-            note_4 = self.c10.get()
-            note_5 = self.c10.get()
+            note1 = self.c2.get()
+            note_2 = self.c3.get()
+            note_3 = self.c4.get()
+            note_4 = self.c5.get()
+            note_5 = self.c6.get()
             matricule = self.c1.get()
             
-            ch = [note1, note2, note3, note4, note5, matricule]
+            ch = [note1, note2, note3, note4, note5]
             for champ in ch:
                 if champ == "" or champ == " ":
                     return False
@@ -176,18 +176,18 @@ class PageNotes(tk.Frame):
 
         def ajouter_note():
             
-            if tous_les_champs_ok() and messagebox.askyesno(title="Ajout note", message=" Voulez-vous ajouter cette notation ?"):
+            if tous_les_champs_ok() and messagebox.askyesno(title="Enregistrer note", message=" Voulez-vous ajouter cette notation ?"):
                 
                 req_insertion_note = f"INSERT INTO notes (Matricule_Etud, Note_1, Note_2, Note_3, Note_4, Note_5)\
                                 VALUES (%s, %s, %s, %s, %s, %s)"
 
                 try:
-                    note1 = self.c7.get()
-                    note_2 = self.c8.get()
-                    note_3 = self.c9.get()
-                    note_4 = self.c10.get()
-                    note_5 = self.c10.get()
-                    matricule = self.c1.get()
+                    matricule = self.c7.get()
+                    note1 = self.c2.get()
+                    note_2 = self.c3.get()
+                    note_3 = self.c4.get()
+                    note_4 = self.c5.get()
+                    note_5 = self.c6.get()
 
                     new_note = (matricule, note1, note2, note3, note4, note5)
                     try:
@@ -365,15 +365,23 @@ class PageNotes(tk.Frame):
 
         #################
         ######## bulletin 
-        # Moyenne
+        # moyenne de l'etudiant 
+        def moyenne(note1, note2, note3, note4, note5):
+            notes = [float(note1), float(note2), float(note3), float(note4), float(note5)] 
+
+            if len(notes) == 5:
+                moy = (notes[0] + notes[1] + notes[2] + notes[3] + notes[4]) / 5                    
+
+            return moy
 
         label_moyenne = Label(wrapper3, text="Moyenne")
-        #label_moyenne.place(x=300, y=500)
+        label_moyenne.place(x=600, y=20)
 
         # champs de recuperation de données 
         label1 = Label(wrapper3, text="Matricule")
         label1.grid(row=0, column =0, padx=5, pady=3)
         champs1 = Entry(wrapper3, textvariable=self.c1)
+        champs1.config(state=DISABLED)
         champs1.grid(row=0, column =1, padx=10, pady=3, ipadx=30)
 
 
@@ -432,6 +440,15 @@ class PageNotes(tk.Frame):
         label9.grid(row=10, column =0, padx=15, pady=3)
         champs9 = Entry(wrapper3, textvariable=self.c11)
         champs9.grid(row=10, column =1, padx=5, pady=3, ipadx=30)  
+
+        # boutons de modification
+        btn_ajouter = Button(wrapper3, fg="white", bg="green", text="ajouter", command=ajouter_note)
+        btn_modifier = Button(wrapper3, bg="white", text="modifier", command=modifier_note)
+        btn_supprimer = Button(wrapper3, fg="white",bg="red", text="supprimer", command=supprimer_note)
+
+        btn_ajouter.grid(row=0, column=5, padx=10, pady=5, ipadx=15)
+        btn_modifier.grid(row=1, column=5, padx=10, pady=5, ipadx=10)
+        btn_supprimer.grid(row=2, column=5, padx=10, pady=5, ipadx=10)
 
         # Boutons de navigation
         btn_1 = tk.Button(self, bg="white", text=" Etudiants ",padx=25, pady=6, command=lambda: controller.show_frame(PageEtudiants))
