@@ -39,9 +39,7 @@ req_creation_table_notes = "CREATE TABLE IF NOT EXISTS Notes \
                                 Note_5 int NULL, \
                                 Matricule_Etud varchar(255) NOT NULL,  \
                                 CONSTRAINT FK_EtudiantNote FOREIGN KEY (Matricule_Etud)\
-                                REFERENCES etudiants(Matricule)\
-                                ON DELETE CASCADE\
-                                ON UPDATE CASCADE)"
+                                REFERENCES etudiants(Matricule))"
 # etudiants a ajouter a la creation
 etudiants_a_ajouter = [
     ('20-EFCPC-1', 'YAO', 'marc', 'M', "1984-5-21", 'Abengourou', 'ivoirienne', '07070707', 'marc.yao@efcpc.ci'),

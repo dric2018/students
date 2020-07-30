@@ -86,14 +86,14 @@ class PageNotes(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         label = tk.Label(self, bg="gold", text = "Page Notes", font=LARGE_FONT)
-        label.pack(padx=10, pady=10)
+        label.pack(padx=5, pady=6)
 
         # wrappers
         wrapper1 = LabelFrame(self, text="Tableau des notes")
         wrapper2 = LabelFrame(self, text="Rechercher")
-        wrapper3 = LabelFrame(self, text="Bulletin Etudiant & Notes")
+        wrapper3 = LabelFrame(self, text="Bulletin Etudiant")
 
-        wrapper1.pack(fill="both", expand="yes", padx=20, pady=10)
+        wrapper1.pack(fill="both", expand="yes", padx=20, pady=15)
         wrapper2.pack(fill="both", expand="yes", padx=20, pady=10)
         wrapper3.pack(fill="both", expand="yes", padx=20, pady=10)
 
@@ -110,6 +110,8 @@ class PageNotes(tk.Frame):
         self.c10 = tk.StringVar()
         self.c11 = tk.StringVar()
         self.c12 = tk.StringVar()
+        self.moyenne_val= tk.StringVar()
+        self.rang_val= tk.StringVar()
 
         # fonctions
         def update(lignes):
@@ -119,7 +121,31 @@ class PageNotes(tk.Frame):
 
 
 
+        def lister_notes():
+            req_lister_notes = "SELECT * FROM Notes"
 
+            mon_curseur.execute(req_lister_notes)
+            result = mon_curseur.fetchall()
+
+            return result
+
+        def get_ranking():
+            notes = lister_notes()
+            all_moyennes = []
+
+            for note in notes:
+                moy = 0
+                notes_etudiant = note[1:6]
+                for n in notes_etudiant:
+                    moy += n/len(notes_etudiant)
+                
+                all_moyennes.append(round(moy, 4))
+
+            all_moyennes.sort(reverse=True)
+            moyennes_X_rang = {moy:rang+1 for rang, moy in enumerate(all_moyennes)}
+
+            return all_moyennes, moyennes_X_rang
+            
         def RecherNote():
             req = f"SELECT Note_id, Matricule_Etud, etudiants.Nom, etudiants.Prenoms, \
             etudiants.Sexe, etudiants.Date_naissance, etudiants.Lieu_naissance, Note_1, Note_2, Note_3, Note_4, Note_5 \
@@ -156,18 +182,20 @@ class PageNotes(tk.Frame):
             self.c11.set("")
             self.c12.set("")
             self.c8.set("")
+            self.moyenne_val.set("")
+            self.rang_val.set("")
 
 
         def tous_les_champs_ok():
 
-            note1 = self.c2.get()
-            note_2 = self.c3.get()
-            note_3 = self.c4.get()
-            note_4 = self.c5.get()
-            note_5 = self.c6.get()
+            note_1 = self.c7.get()
+            note_2 = self.c8.get()
+            note_3 = self.c9.get()
+            note_4 = self.c10.get()
+            note_5 = self.c11.get()
             matricule = self.c1.get()
             
-            ch = [note1, note2, note3, note4, note5]
+            ch = [note_1, note_2, note_3, note_4, note_5]
             for champ in ch:
                 if champ == "" or champ == " ":
                     return False
@@ -176,20 +204,20 @@ class PageNotes(tk.Frame):
 
         def ajouter_note():
             
-            if tous_les_champs_ok() and messagebox.askyesno(title="Enregistrer note", message=" Voulez-vous ajouter cette notation ?"):
+            if messagebox.askyesno(title="Enregistrer note", message=" Voulez-vous ajouter cette notation ?"):
                 
-                req_insertion_note = f"INSERT INTO notes (Matricule_Etud, Note_1, Note_2, Note_3, Note_4, Note_5)\
+                req_insertion_note = f"INSERT INTO Notes (Matricule_Etud, Note_1, Note_2, Note_3, Note_4, Note_5)\
                                 VALUES (%s, %s, %s, %s, %s, %s)"
 
                 try:
-                    matricule = self.c7.get()
-                    note1 = self.c2.get()
-                    note_2 = self.c3.get()
-                    note_3 = self.c4.get()
-                    note_4 = self.c5.get()
-                    note_5 = self.c6.get()
+                    matricule = self.c1.get()
+                    note_1 = self.c7.get()
+                    note_2 = self.c8.get()
+                    note_3 = self.c9.get()
+                    note_4 = self.c10.get()
+                    note_5 = self.c11.get()
 
-                    new_note = (matricule, note1, note2, note3, note4, note5)
+                    new_note = (matricule, note_1, note_2, note_3, note_4, note_5)
                     try:
                         mon_curseur.execute(req_insertion_note, new_note)
                         ma_bd.commit()
@@ -216,8 +244,8 @@ class PageNotes(tk.Frame):
         def supprimer_note():
             matricule = self.c1.get()
 
-            if tous_les_champs_ok() and messagebox.askyesno(title="Suppression de note", message=" Voulez-vous supprimer cet étudiant ?"):
-                req = "DELETE FROM Notes WHERE Matricule = %s"
+            if messagebox.askyesno(title="Suppression de note", message=" Voulez-vous supprimer cet étudiant ?"):
+                req = "DELETE FROM Notes WHERE Matricule_Etud = %s"
                 mon_curseur.execute(req, (matricule,))
                 ma_bd.commit()
 
@@ -231,29 +259,29 @@ class PageNotes(tk.Frame):
 
         def modifier_note():
 
-            if tous_les_champs_ok() and messagebox.askyesno(title="Modification de note", message=" Voulez-vous modifier les notes de cet étudiant ?"):
+            if messagebox.askyesno(title="Modification de note", message=" Voulez-vous modifier les notes de cet étudiant ?"):
 
-                note_id = self.c1.get()
-                note_1 = self.c2.get()
-                note_2 = self.c3.get()
-                note_3 = self.c4.get()
-                note_4 = self.c5.get()
-                note_5 = self.c6.get()
-                matricule = self.c7.get()
-
-
-                new_note = (matricule, note1, note2, note3, note4, note5)
+                note_1 = self.c7.get()
+                note_2 = self.c8.get()
+                note_3 = self.c9.get()
+                note_4 = self.c10.get()
+                note_5 = self.c11.get()
+                matricule = self.c1.get()
+                
+                new_notes = (note_1, note_2, note_3, note_4, note_5, matricule)
 
 
-                req = "UPDATE Etudiants SET Nom=%s, Prenoms=%s, Sexe=%s, Date_naissance=%s, Lieu_naissance=%s, Nationalite=%s, Telephone=%s, Email=%s WHERE Matricule = %s"
-                mon_curseur.execute(req, new_note)
+                req = "UPDATE Notes SET Note_1=%s, Note_2=%s, Note_3=%s, Note_4=%s, Note_5=%s\
+                        WHERE Matricule_Etud =%s"
+
+                mon_curseur.execute(req, (new_notes))
                 ma_bd.commit()
 
                 # afficher un pop-up de succes
                 messagebox.showinfo(title="Modification de notes ", message="Modification enregistrée !")
                 effacer()
                 
-                print("[INFO] Modification étudiant enregistrée !")
+                print("[INFO] Modification de note enregistrée !")
 
             else:
                 messagebox.showerror(title="Modification de notes", message="La modification a échoué !")
@@ -285,12 +313,36 @@ class PageNotes(tk.Frame):
             self.c9.set(selection['values'][9])
             self.c10.set(selection['values'][10])
             self.c11.set(selection['values'][11])
+            note_1 = self.c7.get()
+            note_2 = self.c8.get()
+            note_3 = self.c9.get()
+            note_4 = self.c10.get()
+            note_5 = self.c11.get()
+
+            notes = [float(note_1), float(note_2), float(note_3), float(note_4), float(note_5)] 
+            notes = [note for note in notes if note > 0]
+
+            if len(notes) == 5:
+                moy = 0
+                for n in notes:
+                    moy += n/5
+            
+            
+                _, ranking = get_ranking()
+                rang = ranking[moy]
+                if rang == 1:
+                    rang = "1er"
+                else:
+                    rang = str(rang)+"e"
+
+                self.moyenne_val.set(round(moy, 5)) 
+                self.rang_val.set(rang)
 
             print(f"[INFO] Ligne {id_ligne} sélectionnée")
 
         # le treeView 
         tree = ttk.Treeview(wrapper1, columns=(1, 2, 3, 4, 5, 6, 7, 8,9,10,11,12), 
-                            show="headings", height=5)
+                            show="headings", height=4)
 
         tree.pack(side=tk.LEFT)
         tree.place(x=0, y=0)
@@ -365,23 +417,23 @@ class PageNotes(tk.Frame):
 
         #################
         ######## bulletin 
-        # moyenne de l'etudiant 
-        def moyenne(note1, note2, note3, note4, note5):
-            notes = [float(note1), float(note2), float(note3), float(note4), float(note5)] 
+        # ###############               
 
-            if len(notes) == 5:
-                moy = (notes[0] + notes[1] + notes[2] + notes[3] + notes[4]) / 5                    
 
-            return moy
-
-        label_moyenne = Label(wrapper3, text="Moyenne")
+        label_moyenne = Label(wrapper3, bg="white", text="Moyenne : ")
         label_moyenne.place(x=600, y=20)
+        val_moyenne = Label(wrapper3, textvariable=self.moyenne_val)
+        val_moyenne.place(x=680, y=20)
+
+        label_rang = Label(wrapper3, bg="white", text="Rang : ")
+        label_rang.place(x=600, y=50)
+        val_rang = Label(wrapper3, textvariable=self.rang_val)
+        val_rang.place(x=680, y=50)
 
         # champs de recuperation de données 
         label1 = Label(wrapper3, text="Matricule")
         label1.grid(row=0, column =0, padx=5, pady=3)
         champs1 = Entry(wrapper3, textvariable=self.c1)
-        champs1.config(state=DISABLED)
         champs1.grid(row=0, column =1, padx=10, pady=3, ipadx=30)
 
 
