@@ -15,11 +15,11 @@ $ pip install mysql-connector-python-rf
 
 
 # Usage
-1. Run partie_1.py script to initilaize the project with its database and first table
+1. Run __partie_1.py__ script to initilaize the project with its database and first table
   ```
   $ python partie_1.py
   ```
-2. Then, Run partie_2.py script to create and populate the second table.
+2. Then, Run __partie_2.py__ script to create and populate the second table.
   ```
   $ python partie_2.py
   ```
