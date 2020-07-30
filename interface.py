@@ -65,9 +65,11 @@ class AppStudent(tk.Tk):
 class PageAccueil(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, bg="white", text = "Page d'accueil", font=LARGE_FONT)
+        label = tk.Label(self, bg="gold", text = "Page d'accueil", font=LARGE_FONT)
         label.pack(padx=10, pady=10)
 
+        l = Label(self, bg="gold", text = " Etu-GES ", font=("Times", 50))
+        l.place(x=280, y=250)
 
         btn_1 = tk.Button(self, bg="white", text=" Etudiants ",padx=10, pady=5, command=lambda: controller.show_frame(PageEtudiants))
         btn_2 = tk.Button(self, bg="white",  text=" Notes ", padx=10, pady=5, command=lambda: controller.show_frame(PageNotes))
@@ -83,7 +85,7 @@ class PageAccueil(tk.Frame):
 class PageNotes(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, bg="white", text = "Page Notes", font=LARGE_FONT)
+        label = tk.Label(self, bg="gold", text = "Page Notes", font=LARGE_FONT)
         label.pack(padx=10, pady=10)
 
         wrapper1 = LabelFrame(self, text="Tableau des notes")
@@ -111,7 +113,7 @@ class PageNotes(tk.Frame):
 class PageEtudiants(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, bg="white", text = "Page Etudiants", font=LARGE_FONT)
+        label = tk.Label(self, bg="gold", text = "Page Etudiants", font=LARGE_FONT)
         label.pack(padx=5, pady=6)
 
         self.q = tk.StringVar() # champ rechercher
@@ -149,65 +151,144 @@ class PageEtudiants(tk.Frame):
 
         def effacer():
 
-            req = "SELECT Matricule, Nom, Prenoms, Sexe, Date_naissance, Lieu_naissance, Email\
-                    FROM Etudiants ORDER BY Nom, Prenoms ASC"
+            req = "SELECT * FROM Etudiants ORDER BY Nom, Prenoms ASC"
             
             mon_curseur.execute(req)
             lignes = mon_curseur.fetchall()
             update(lignes)
             self.q.set("")
+            self.c1.set("")
+            self.c2.set("")
+            self.c3.set("")
+            self.c4.set("")
+            self.c5.set("")
+            self.c6.set("")
+            self.c7.set("")
+            self.c8.set("")
+            self.c9.set("")
 
 
+        def tous_les_champs_ok():
 
+            matricule = self.c1.get()
+            nom = self.c2.get()
+            prenoms = self.c3.get()
+            sexe = self.c4.get()
+            date_naissance = self.c5.get()
+            lieu_naissance = self.c6.get()
+            nationalite = self.c7.get()
+            telephone = self.c8.get()
+            email = self.c9.get()
 
+            ch = [matricule, nom, prenoms, sexe, date_naissance, lieu_naissance, nationalite, telephone, email]
+            for champ in ch:
+                if champ == "" or champ == " ":
+                    return False
+                else :
+                    return True
 
         def ajouter_etudiant():
             
-            if messagebox.askyesno(title="Ajout d'étudiant", message=" Voulez-vous ajouter cet étudiant ?"):
+            if tous_les_champs_ok() and messagebox.askyesno(title="Ajout d'étudiant", message=" Voulez-vous ajouter cet étudiant ?"):
+                
                 req_insertion_etudiant = f"INSERT INTO Etudiants (Matricule, Nom, Prenoms, Sexe, \
                                                 Date_naissance, Lieu_naissance, Nationalite, Telephone, Email)\
                                                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                
+                try:
+                    matricule = self.c1.get()
+                    nom = self.c2.get()
+                    prenoms = self.c3.get()
+                    sexe = self.c4.get()
+                    date_naissance = self.c5.get()
+                    lieu_naissance = self.c6.get()
+                    nationalite = self.c7.get()
+                    telephone = self.c8.get()
+                    email = self.c9.get()
+
+                    etudiant = (matricule, 
+                                    nom.upper(), 
+                                    prenoms.lower(), 
+                                    sexe, 
+                                    date_naissance, 
+                                    lieu_naissance, 
+                                    nationalite.lower(), 
+                                    telephone, 
+                                    email)
+
+
+                    mon_curseur.execute(req_insertion_etudiant, etudiant)
+                    print("[INFO] Nouvel étudiant enregistré !")
+                    messagebox.showinfo(title="Enregistrement etudiant", message=f"Etudiant {matricule} enregistré !")
+                    
+                    ma_bd.commit()
+                    effacer()
+
+                except Exception as e:
+                    print("[INFO]", e)
+                    messagebox.showerror(title="Enregistrement etudiant", message=f"Erreur lors de l'enregistrement !")
+
+            else:
+                messagebox.showerror(title="Enregistrement etudiant", message=f"Erreur lors de l'enregistrement !")
+                messagebox.showwarning(title="Enregistrement etudiant", message=f"Assurez-vous que tous les champs sont renseignés !")
+                return True
+
+
+        def supprimer_etudiant():
+            matricule = self.c1.get()
+
+            if tous_les_champs_ok() and messagebox.askyesno(title="Suppression d'étudiant", message=" Voulez-vous supprimer cet étudiant ?"):
+                req = "DELETE FROM Etudiants WHERE Matricule = %s"
+                mon_curseur.execute(req, (matricule,))
+                ma_bd.commit()
+
+                messagebox.showinfo(title="Suppression d'étudiants", message=f"Etudiant {matricule} définitivement supprimé !")
+                effacer()
+            else:
+                messagebox.showerror(title="Suppression d'étudiants", message=f"l'opération a échoué !")
+                messagebox.showwarning(title="Suppression d'étudiants", message=f"Assurez-vous que tous les champs sont renseignés !")
+                return True
+
+
+        def modifier_etudiant():
+
+            if tous_les_champs_ok() and messagebox.askyesno(title="Modification d'étudiant", message=" Voulez-vous modifier cet étudiant ?"):
+
                 matricule = self.c1.get()
                 nom = self.c2.get()
                 prenoms = self.c3.get()
                 sexe = self.c4.get()
                 date_naissance = self.c5.get()
-                lieu_naissance = self.c5.get()
-                nationalite = self.c6.get()
-                telephone = self.c7.get()
-                email = self.c8.get()
+                lieu_naissance = self.c6.get()
+                nationalite = self.c7.get()
+                telephone = self.c8.get()
+                email = self.c9.get()
 
-                etudiant = (matricule, 
-                                nom.upper(), 
+                etudiant = (nom.upper(), 
                                 prenoms.lower(), 
                                 sexe, 
                                 date_naissance, 
-                                lieu_naissance, 
+                                lieu_naissance.lower(), 
                                 nationalite.lower(), 
                                 telephone, 
-                                email)
+                                email, 
+                                matricule)
 
-                effacer()   
-
+                req = "UPDATE Etudiants SET Nom=%s, Prenoms=%s, Sexe=%s, Date_naissance=%s, Lieu_naissance=%s, Nationalite=%s, Telephone=%s, Email=%s WHERE Matricule = %s"
                 mon_curseur.execute(req, etudiant)
-                print("[INFO] Nouvel étudiant enregistré !")
+                ma_bd.commit()
 
-            else:
-                return True
-
-
-        def supprimer_etudiant():
-            matricule_etu = self.c1.get()
-
-            if messagebox.askyesno(title="Suppression d'étudiant", message=" Voulez-vous supprimer cet étudiant ?"):
-                req = "DELETE FROM Etudiants WHERE Matricule = "+matricule_etu
-                mon_curseur.execute(req)
+                # afficher un pop-up de succes
+                messagebox.showinfo(title="Modification d'étudiants", message="Modification enregistrée !")
                 effacer()
+                
+                print("[INFO] Modification étudiant enregistrée !")
+
             else:
+                messagebox.showerror(title="Modification d'étudiants", message="La modification a échoué !")
+                messagebox.showwarning(title="Modification d'étudiants", message=f"Assurez-vous que tous les champs sont renseignés !")
                 return True
 
-        def modifier_etudiant():
-            pass
 
         ################# afficher les etudiants 
 
@@ -221,7 +302,6 @@ class PageEtudiants(tk.Frame):
         def get_ligne(event):
             id_ligne = tree.identify_row(event.y)
             selection = tree.item(tree.focus())
-            print(selectiion)
             self.c1.set(selection['values'][0])
             self.c2.set(selection['values'][1])
             self.c3.set(selection['values'][2])
@@ -229,7 +309,9 @@ class PageEtudiants(tk.Frame):
             self.c5.set(selection['values'][4])
             self.c6.set(selection['values'][5])
             self.c7.set(selection['values'][6])
-
+            self.c8.set(selection['values'][7])
+            self.c9.set(selection['values'][8])
+            print(f"[INFO] Ligne {id_ligne} sélectionnée")
         # les wrapers
         wrapper1 = LabelFrame(self, text="Liste étudiants")
         wrapper2 = LabelFrame(self, text="Rechercher")
@@ -257,10 +339,10 @@ class PageEtudiants(tk.Frame):
         # taille des colonnes 
         tree.column("#1", width=80, minwidth=80, stretch=False)
         tree.column("#2", width=80, minwidth=80, stretch=False)
-        tree.column("#3", width=80, minwidth=80, stretch=False)
-        tree.column("#4", width=40, minwidth=40, stretch=False)
-        tree.column("#5", width=80, minwidth=80, stretch=False)
-        tree.column("#6", width=80, minwidth=80, stretch=False)
+        tree.column("#3", width=100, minwidth=100, stretch=False)
+        tree.column("#4", width=33, minwidth=33, stretch=False)
+        tree.column("#5", width=100, minwidth=100, stretch=False)
+        tree.column("#6", width=100, minwidth=100, stretch=False)
         tree.column("#7", width=80, minwidth=80, stretch=False)
         tree.column("#8", width=80, minwidth=80, stretch=False)
         tree.column("#9", width=80, minwidth=80, stretch=False)
@@ -278,16 +360,19 @@ class PageEtudiants(tk.Frame):
         for ligne in lignes:
              tree.insert('', 'end', values=ligne)
 
+        # en cas de double-click sur un éleve
+        tree.bind("<Double-1>", get_ligne)
+
         ######### barre de recherche
         label_recherche_etudiant = Label(wrapper2, text="Rechercher")
         label_recherche_etudiant.pack(side=tk.LEFT, padx = 10)
 
 
         champs_saisie1 = Entry(wrapper2, textvariable= self.q)
-        champs_saisie1.pack(side=tk.LEFT, padx=10)
-        btn_rechercher_etudiant = Button(wrapper2, text="Rechercher", command=RecherCherEtudiant)
+        champs_saisie1.pack(side=tk.LEFT, padx=10, ipadx=30)
+        btn_rechercher_etudiant = Button(wrapper2, bg="white", text="Rechercher", command=RecherCherEtudiant)
         
-        btn_effacer_recherche = Button(wrapper2, text="Effacer", command=effacer)
+        btn_effacer_recherche = Button(wrapper2, bg="white", text="Effacer", command=effacer)
         btn_effacer_recherche.pack(side=tk.LEFT, padx=10, pady=5)
         btn_rechercher_etudiant.pack(side=tk.LEFT, padx=10, pady=5)
         
@@ -296,49 +381,49 @@ class PageEtudiants(tk.Frame):
         label1 = Label(wrapper3, text="Matricule")
         label1.grid(row=0, column =0, padx=5, pady=3)
         champs1 = Entry(wrapper3, textvariable=self.c1)
-        champs1.grid(row=0, column =1, padx=10, pady=3)
-        print(champs1.get())
+        champs1.grid(row=0, column =1, padx=10, pady=3, ipadx=30)
+
 
         label2 = Label(wrapper3, text="Nom")
         label2.grid(row=1, column =0, padx=10, pady=3)
         champs2 = Entry(wrapper3, textvariable=self.c2)
-        champs2.grid(row=1, column =1, padx=5, pady=3)
+        champs2.grid(row=1, column =1, padx=5, pady=3, ipadx=30)
 
         label3 = Label(wrapper3, text="Prenoms")
         label3.grid(row=2, column =0, padx=20, pady=3)
         champs3 = Entry(wrapper3, textvariable=self.c3)
-        champs3.grid(row=2, column =1, padx=5, pady=3)
+        champs3.grid(row=2, column =1, padx=5, pady=3, ipadx=30)
 
 
         label4 = Label(wrapper3, text="Sexe")
         label4.grid(row=3, column =0, padx=5, pady=3)
         champs4 = Entry(wrapper3, textvariable=self.c4)
-        champs4.grid(row=3, column =1, padx=5, pady=3)
+        champs4.grid(row=3, column =1, padx=5, pady=3, ipadx=30)
 
         label5 = Label(wrapper3, text="Date de naissance")
         label5.grid(row=4, column =0, padx=5, pady=3)
         champs5 = Entry(wrapper3, textvariable=self.c5)
-        champs5.grid(row=4, column =1, padx=5, pady=3)
+        champs5.grid(row=4, column =1, padx=5, pady=3, ipadx=30)
 
         label6 = Label(wrapper3, text="Lieu de naissance")
         label6.grid(row=5, column =0, padx=10, pady=3)
         champs6 = Entry(wrapper3, textvariable=self.c6)
-        champs6.grid(row=5, column =1, padx=5, pady=3)
+        champs6.grid(row=5, column =1, padx=5, pady=3, ipadx=30)
 
         label7 = Label(wrapper3, text="Nationalité")
         label7.grid(row=6, column =0, padx=5, pady=3)
         champs7 = Entry(wrapper3, textvariable=self.c7)
-        champs7.grid(row=6, column =1, padx=5, pady=3)
+        champs7.grid(row=6, column =1, padx=5, pady=3, ipadx=30)
 
         label8 = Label(wrapper3, text="Telephone")
         label8.grid(row=7, column =0, padx=10, pady=3)
         champs8 = Entry(wrapper3, textvariable=self.c8)
-        champs8.grid(row=7, column =1, padx=5, pady=3)
+        champs8.grid(row=7, column =1, padx=5, pady=3, ipadx=30)
 
         label9 = Label(wrapper3, text="Email")
         label9.grid(row=8, column =0, padx=15, pady=3)
         champs9 = Entry(wrapper3, textvariable=self.c9)
-        champs9.grid(row=8, column =1, padx=5, pady=3)
+        champs9.grid(row=8, column =1, padx=5, pady=3, ipadx=30)
 
 
         # boutons de modification
