@@ -121,13 +121,12 @@ class PageNotes(tk.Frame):
 
 
         def RecherNote():
-            req = f"SELECT SELECT Note_id, Matricule_Etud, etudiants.Nom, etudiants.Prenoms, \
-            etudiants.Sexe, etudiants.Date_naissance, etudiants.Lieu_naissance, Note_1, Note_2, Note_3, Note_4, Note_5 \
-            FROM Notes \
-            WHERE etudiants.Prenoms LIKE '%{self.q.get().lower()}%' OR etudiants.Nom LIKE '%{self.q.get().upper()}%' \
-            INNER JOIN `etudiants` ON notes.Matricule_Etud = etudiants.Matricule \
-            ORDER BY Matricule_Etud ASC"            
-            
+            req = f"SELECT Note_id, Matricule_Etud, etudiants.Nom, etudiants.Prenoms, etudiants.Sexe,etudiants.Date_naissance, \
+            etudiants.Lieu_naissance, Note_1, Note_2, Note_3, Note_4, Note_5 \
+            FROM notes\
+            INNER JOIN `etudiants` ON notes.Matricule_Etud = etudiants.Matricule\
+            WHERE etudiants.Prenoms LIKE '%{self.q.get().lower()}%' OR etudiants.Nom LIKE '%{self.q.get().lower()}%' ORDER BY Matricule_Etud ASC"
+
             mon_curseur.execute(req)
             result = mon_curseur.fetchall()
             update(result)
@@ -161,21 +160,21 @@ class PageNotes(tk.Frame):
 
         def tous_les_champs_ok():
 
-            note1 = self.c2.get()
-            note_2 = self.c3.get()
-            note_3 = self.c4.get()
-            note_4 = self.c5.get()
-            note_5 = self.c6.get()
+            note1 = self.c7.get()
+            note_2 = self.c8.get()
+            note_3 = self.c9.get()
+            note_4 = self.c10.get()
+            note_5 = self.c10.get()
             matricule = self.c1.get()
             
-            ch = [note1, note2, note3, note4, note5]
+            ch = [note1, note2, note3, note4, note5, matricule]
             for champ in ch:
                 if champ == "" or champ == " ":
                     return False
                 else :
                     return True
 
-        def ajouter_etudiant():
+        def ajouter_note():
             
             if tous_les_champs_ok() and messagebox.askyesno(title="Ajout note", message=" Voulez-vous ajouter cette notation ?"):
                 
@@ -183,12 +182,12 @@ class PageNotes(tk.Frame):
                                 VALUES (%s, %s, %s, %s, %s, %s)"
 
                 try:
-                    matricule = self.c7.get()
-                    note1 = self.c2.get()
-                    note_2 = self.c3.get()
-                    note_3 = self.c4.get()
-                    note_4 = self.c5.get()
-                    note_5 = self.c6.get()
+                    note1 = self.c7.get()
+                    note_2 = self.c8.get()
+                    note_3 = self.c9.get()
+                    note_4 = self.c10.get()
+                    note_5 = self.c10.get()
+                    matricule = self.c1.get()
 
                     new_note = (matricule, note1, note2, note3, note4, note5)
                     try:
@@ -218,7 +217,7 @@ class PageNotes(tk.Frame):
             matricule = self.c1.get()
 
             if tous_les_champs_ok() and messagebox.askyesno(title="Suppression de note", message=" Voulez-vous supprimer cet étudiant ?"):
-                req = "DELETE FROM Etudiants WHERE Matricule = %s"
+                req = "DELETE FROM Notes WHERE Matricule = %s"
                 mon_curseur.execute(req, (matricule,))
                 ma_bd.commit()
 
@@ -275,18 +274,17 @@ class PageNotes(tk.Frame):
         def get_ligne(event):
             id_ligne = tree.identify_row(event.y)
             selection = tree.item(tree.focus())
-            self.c1.set(selection['values'][0])
-            self.c2.set(selection['values'][1])
-            self.c3.set(selection['values'][2])
-            self.c4.set(selection['values'][3])
-            self.c5.set(selection['values'][4])
-            self.c6.set(selection['values'][5])
-            self.c7.set(selection['values'][6])
-            self.c8.set(selection['values'][2])
-            self.c9.set(selection['values'][8])
-            self.c10.set(selection['values'][9])
-            self.c11.set(selection['values'][10])
-            self.c12.set(selection['values'][11])
+            self.c1.set(selection['values'][1])
+            self.c2.set(selection['values'][2])
+            self.c3.set(selection['values'][3])
+            self.c4.set(selection['values'][4])
+            self.c5.set(selection['values'][5])
+            self.c6.set(selection['values'][6])
+            self.c7.set(selection['values'][7])
+            self.c8.set(selection['values'][8])
+            self.c9.set(selection['values'][9])
+            self.c10.set(selection['values'][10])
+            self.c11.set(selection['values'][11])
 
             print(f"[INFO] Ligne {id_ligne} sélectionnée")
 
@@ -367,7 +365,11 @@ class PageNotes(tk.Frame):
 
         #################
         ######## bulletin 
-        #      
+        # Moyenne
+
+        label_moyenne = Label(wrapper3, text="Moyenne")
+        #label_moyenne.place(x=300, y=500)
+
         # champs de recuperation de données 
         label1 = Label(wrapper3, text="Matricule")
         label1.grid(row=0, column =0, padx=5, pady=3)
@@ -378,27 +380,32 @@ class PageNotes(tk.Frame):
         label2 = Label(wrapper3, text="Nom")
         label2.grid(row=1, column =0, padx=10, pady=3)
         champs2 = Entry(wrapper3, textvariable=self.c2)
+        champs2.config(state=DISABLED)
         champs2.grid(row=1, column =1, padx=5, pady=3, ipadx=30)
 
         label3 = Label(wrapper3, text="Prenoms")
         label3.grid(row=2, column =0, padx=20, pady=3)
         champs3 = Entry(wrapper3, textvariable=self.c3)
+        champs3.config(state=DISABLED)
         champs3.grid(row=2, column =1, padx=5, pady=3, ipadx=30)
 
 
         label4 = Label(wrapper3, text="Sexe")
         label4.grid(row=3, column =0, padx=5, pady=3)
         champs4 = Entry(wrapper3, textvariable=self.c4)
+        champs4.config(state=DISABLED)
         champs4.grid(row=3, column =1, padx=5, pady=3, ipadx=30)
 
         label5 = Label(wrapper3, text="Date de naissance")
         label5.grid(row=4, column =0, padx=5, pady=3)
         champs5 = Entry(wrapper3, textvariable=self.c5)
+        champs5.config(state=DISABLED)
         champs5.grid(row=4, column =1, padx=5, pady=3, ipadx=30)
 
         label6 = Label(wrapper3, text="Lieu de naissance")
         label6.grid(row=5, column =0, padx=10, pady=3)
         champs6 = Entry(wrapper3, textvariable=self.c6)
+        champs6.config(state=DISABLED)
         champs6.grid(row=5, column =1, padx=5, pady=3, ipadx=30)
 
         label7 = Label(wrapper3, text="Note 1")
