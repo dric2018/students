@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
+from PIL import ImageTk, Image
 
 import mysql.connector as mc 
 
@@ -22,7 +23,7 @@ mon_curseur = ma_bd.cursor()
 
 # mysql requetes
 
-LARGE_FONT = ("Verdana", 12)
+LARGE_FONT = ("Times", 12)
 
 
 # definition de l'application
@@ -30,7 +31,7 @@ class AppStudent(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
         self.resizable(False, False)
-        self.geometry("800x700")
+        self.geometry("900x700")
 
         container = tk.Frame(self)
 
@@ -65,14 +66,13 @@ class AppStudent(tk.Tk):
 class PageAccueil(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, bg="gold", text = "Page d'accueil", font=LARGE_FONT)
-        label.pack(padx=10, pady=10)
 
-        l = Label(self, bg="gold", text = " Etu-GES ", font=("Times", 50))
-        l.place(x=280, y=250)
+        l = Label(self, bg="gold", text = " Etu-GES ", font=("Times", 70))
+        l.place(x=240, y=200)
 
-        btn_1 = tk.Button(self, bg="white", text=" Etudiants ",padx=10, pady=5, command=lambda: controller.show_frame(PageEtudiants))
-        btn_2 = tk.Button(self, bg="white",  text=" Notes ", padx=10, pady=5, command=lambda: controller.show_frame(PageNotes))
+        # Boutons de navigation
+        btn_1 = tk.Button(self, bg="white", text=" Notes ",padx=25, pady=6, command=lambda: controller.show_frame(PageNotes))
+        btn_2 = tk.Button(self, bg="white",  text=" Etudiants ", padx=20, pady=6, command=lambda: controller.show_frame(PageEtudiants))
 
         btn_1.pack( side=tk.BOTTOM)
         btn_2.pack(side=tk.BOTTOM)
@@ -95,16 +95,16 @@ class PageNotes(tk.Frame):
         wrapper1.pack(fill="both", expand="yes", padx=20, pady=10)
         wrapper2.pack(fill="both", expand="yes", padx=20, pady=10)
         wrapper3.pack(fill="both", expand="yes", padx=20, pady=10)
-
-         # Boutons de navigation
-        btn_1 = tk.Button(self, bg="white", text=" Accueil ",padx=10, pady=6, command=lambda: controller.show_frame(PageAccueil))
-        btn_2 = tk.Button(self, bg="white",  text=" Etudiants ", padx=10, pady=6, command=lambda: controller.show_frame(PageEtudiants))
+        
+        # Boutons de navigation
+        btn_1 = tk.Button(self, bg="white", text=" Notes ",padx=25, pady=6, command=lambda: controller.show_frame(PageNotes))
+        btn_2 = tk.Button(self, bg="white",  text=" Etudiants ", padx=20, pady=6, command=lambda: controller.show_frame(PageEtudiants))
 
         btn_1.pack( side=tk.BOTTOM)
         btn_2.pack(side=tk.BOTTOM)
 
-        btn_1.place(x=325, y=650)
-        btn_2.place(x=425, y=650)
+        btn_1.place(x=325, y=500)
+        btn_2.place(x=425, y=500)
 
 
 
@@ -317,35 +317,38 @@ class PageEtudiants(tk.Frame):
         wrapper2 = LabelFrame(self, text="Rechercher")
         wrapper3 = LabelFrame(self, text="Infos Etudiant")
 
-        wrapper1.pack(fill="both", expand="yes", padx=20, pady=10)
+        wrapper1.pack(fill="both", expand="yes", padx=20, pady=5)
         wrapper2.pack(fill="both", expand="yes", padx=20, pady=5)
         wrapper3.pack(fill="both", expand="yes", padx=20, pady=10)
 
         # le treeView 
-        tree = ttk.Treeview(wrapper1, columns=(1, 2, 3, 4, 5, 6, 7, 8, 9), show="headings", height=10)
+        tree = ttk.Treeview(wrapper1, columns=(1, 2, 3, 4, 5, 6, 7, 8, 9), show="headings", height=5)
         tree.pack(side=tk.LEFT)
         tree.place(x=0, y=0)
-        tree.heading(0, text="")
-        tree.heading(1, text="Matricule")
-        tree.heading(2, text="Nom")
-        tree.heading(3, text="Prenom(s)")
-        tree.heading(4, text="Sexe")
-        tree.heading(5, text="Date de naissance")
-        tree.heading(6, text="Lieu de naissance")
-        tree.heading(7, text="Nationalité")
-        tree.heading(8, text="Telephone")
-        tree.heading(9, text="Email")
+
+        style = ttk.Style(tree)
+        style.configure("Treeview", rowheight=15)
+        tree.heading("#0", text="")
+        tree.heading("#1", text="Matricule")
+        tree.heading("#2", text="Nom")
+        tree.heading("#3", text="Prenom(s)")
+        tree.heading("#4", text="Sexe")
+        tree.heading("#5", text="Date de naissance")
+        tree.heading("#6", text="Lieu de naissance")
+        tree.heading("#7", text="Nationalité")
+        tree.heading("#8", text="Telephone")
+        tree.heading("#9", text="Email")
 
         # taille des colonnes 
-        tree.column("#1", width=80, minwidth=80, stretch=False)
-        tree.column("#2", width=80, minwidth=80, stretch=False)
-        tree.column("#3", width=100, minwidth=100, stretch=False)
+        tree.column("#1", width=75, minwidth=75, stretch=False)
+        tree.column("#2", width=90, minwidth=90, stretch=False)
+        tree.column("#3", width=130, minwidth=130, stretch=False)
         tree.column("#4", width=33, minwidth=33, stretch=False)
-        tree.column("#5", width=100, minwidth=100, stretch=False)
+        tree.column("#5", width=105, minwidth=105, stretch=False)
         tree.column("#6", width=100, minwidth=100, stretch=False)
         tree.column("#7", width=80, minwidth=80, stretch=False)
-        tree.column("#8", width=80, minwidth=80, stretch=False)
-        tree.column("#9", width=80, minwidth=80, stretch=False)
+        tree.column("#8", width=70, minwidth=70, stretch=False)
+        tree.column("#9", width=150, minwidth=100, stretch=False)
 
         #scrollBars
         yscrollbar = ttk.Scrollbar(wrapper1, orient="vertical", command=tree.yview)
@@ -353,10 +356,11 @@ class PageEtudiants(tk.Frame):
 
         xscrollbar = ttk.Scrollbar(wrapper1, orient="horizontal", command=tree.xview)
         xscrollbar.pack(side=tk.BOTTOM, fill="x")
+
         tree.configure(yscrollcommand=yscrollbar.set, xscrollcommand=xscrollbar.set)
 
 
-        # affichage 
+        # affichage de la liste
         for ligne in lignes:
              tree.insert('', 'end', values=ligne)
 
@@ -373,7 +377,7 @@ class PageEtudiants(tk.Frame):
         btn_rechercher_etudiant = Button(wrapper2, bg="white", text="Rechercher", command=RecherCherEtudiant)
         
         btn_effacer_recherche = Button(wrapper2, bg="white", text="Effacer", command=effacer)
-        btn_effacer_recherche.pack(side=tk.LEFT, padx=10, pady=5)
+        btn_effacer_recherche.pack(side=tk.LEFT, padx=20, pady=10)
         btn_rechercher_etudiant.pack(side=tk.LEFT, padx=10, pady=5)
         
         ######### Buletin etudiant
@@ -431,18 +435,18 @@ class PageEtudiants(tk.Frame):
         btn_modifier = Button(wrapper3, bg="white", text="modifier", command=modifier_etudiant)
         btn_supprimer = Button(wrapper3, fg="white",bg="red", text="supprimer", command=supprimer_etudiant)
 
-        btn_ajouter.grid(row=9, column=0, padx=10, pady=5)
-        btn_modifier.grid(row=9, column=1, padx=10, pady=5)
-        btn_supprimer.grid(row=9, column=2, padx=10, pady=5)
+        btn_ajouter.grid(row=0, column=5, padx=10, pady=5, ipadx=15)
+        btn_modifier.grid(row=1, column=5, padx=10, pady=5, ipadx=10)
+        btn_supprimer.grid(row=2, column=5, padx=10, pady=5, ipadx=10)
 
         # Boutons de navigation
-        btn_1 = tk.Button(self, bg="white", text=" Accueil ",padx=10, pady=6, command=lambda: controller.show_frame(PageAccueil))
-        btn_2 = tk.Button(self, bg="white",  text=" Notes ", padx=10, pady=6, command=lambda: controller.show_frame(PageNotes))
+        btn_1 = tk.Button(self, bg="white", text=" Accueil ",padx=25, pady=6, command=lambda: controller.show_frame(PageAccueil))
+        btn_2 = tk.Button(self, bg="white",  text=" Notes ", padx=20, pady=6, command=lambda: controller.show_frame(PageNotes))
 
         btn_1.pack( side=tk.BOTTOM)
         btn_2.pack(side=tk.BOTTOM)
 
-        btn_1.place(x=325, y=650)
+        btn_1.place(x=300, y=650)
         btn_2.place(x=425, y=650)
 
         
