@@ -5,7 +5,7 @@ Just have fun guys !
 
 # Config
 1. Frist you will need to install mysql server on your system for the database to be created and populated.
-For this project I have used __xamp__ server which already includes mysql.
+For this project I have used __xamp__ server which already includes mysql (you can also use __WAMP server__ or even __MAMP__ or __LAMP server__).
 [XAMP website](https://www.apachefriends.org/fr/index.html)
 
 2. Second, Run this command line above to install the main module used by python to connect to the mysql database:

@@ -4,6 +4,7 @@ from tkinter import ttk
 from tkinter import messagebox
 from PIL import ImageTk, Image
 
+import math
 import mysql.connector as mc 
 
 BD_NAME = "students"
@@ -139,7 +140,7 @@ class PageNotes(tk.Frame):
                 for n in notes_etudiant:
                     moy += n/len(notes_etudiant)
                 
-                all_moyennes.append(round(moy, 4))
+                all_moyennes.append(moy)
 
             all_moyennes.sort(reverse=True)
             moyennes_X_rang = {moy:rang+1 for rang, moy in enumerate(all_moyennes)}
@@ -326,17 +327,26 @@ class PageNotes(tk.Frame):
                 moy = 0
                 for n in notes:
                     moy += n/5
+                
+                self.moyenne_val.set(f"{moy:.2f}") 
             
             
                 _, ranking = get_ranking()
                 rang = ranking[moy]
                 if rang == 1:
                     rang = "1er"
-                else:
+                elif (rang>1):
                     rang = str(rang)+"e"
+                else:
+                    rang = "Non classé"
 
-                self.moyenne_val.set(round(moy, 5)) 
+                
                 self.rang_val.set(rang)
+            
+            else:
+                self.moyenne_val.set("Non disponible") 
+                self.rang_val.set("Non classé")
+            
 
             print(f"[INFO] Ligne {id_ligne} sélectionnée")
 
